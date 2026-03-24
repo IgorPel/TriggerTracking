@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Edit Trigger" if trigger_id else "Add New Trigger"}}</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; background: #f4f6f9; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .trigger-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 6px; background: #fafafa; }
+
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .input-asset { flex: 2; } /* Монета займає більше місця */
+        .input-value { flex: 2; }
+        .btn-delete { background: #ff4d4d; color: white; border: none; cursor: pointer; padding: 8px 12px; }
+        .btn-add { background: #28a745; color: white; border: none; cursor: pointer; padding: 10px; width: 100%; margin-top: 10px; }
+        .btn-cancel { color: white; border: none; cursor: pointer; padding: 10px; width: 100%; margin-top: 10px; }
+
+        .btn-submit { background: #007bff; color: white; border: none; cursor: pointer; padding: 12px; width: 100%; margin-top: 20px; font-size: 16px; font-weight: bold; }
+
+        /* Приховати кнопку видалення для першого рядка, якщо хочеш */
+        /* .trigger-row:first-child .btn-delete { display: none; } */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>{{ "Edit Logic Trigger" if trigger_id else "Create Logic Trigger"}}</h2>
+
+    <div id="rows-container"></div>
+
+    <button id="add-btn" class="btn-add">+ Add Condition (AND/OR)</button>
+    <button id="submit-btn" class="btn-submit">Save Trigger</button>
+    <button id="cancel-btn" class="btn-cancel">Cancel</button>
+
+</div>
+
+<template id="row-template">
+    <div class="trigger-row">
+        <input type="text" class="asset" list="crypto-list" placeholder="Asset (e.g. BTC)" required>
+
+        <select class="operator">
+            <option value="gt">&gt; (Greater)</option>
+            <option value="lt">&lt; (Less)</option>
+        </select>
+
+        <input type="number" class="value" placeholder="Price" step="any" required>
+
+        <select class="boolean-op">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+            <option value="" selected>END</option>
+        </select>
+
+        <button type="button" class="btn-delete">×</button>
+    </div>
+</template>
+
+<datalist id="crypto-list">
+    <option value="bitcoin">
+    <option value="ethereum">
+    <option value="solana">
+    <option value="cardano">
+    <option value="dogecoin">
+</datalist>
+
+<div id="trigger-config"
+     data-trigger-data='{{ (trigger_data | default([])) | tojson | safe }}'
+     data-trigger-id='{{ trigger_id | default("null") }}'>
+</div>
+
+<script src="{{ url_for('static', path='/js/add_trigger.js') }}"></script>
+
+</body>
+</html>

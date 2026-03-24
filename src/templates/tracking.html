@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>tracking triggers</title>
+    <style>
+        /* Трохи стилів для таблиці прямо тут для прикладу */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .active-row { background-color: #d4edda; } /* Зелений для активних */
+        .triggered-row { background-color: #f8d7da; animation: flash 1s; } /* Червоний, коли спрацював */
+        .de-triggered-row { background-color: #f2f2f2; animation: <de-flash></de-flash> 1s; }
+        .delete { background-color: #ff0000}
+
+        @keyframes flash {
+            0% { background-color: red; }
+            100% { background-color: #f8d7da; }
+        }
+
+        @keyframes de-flash {
+            0% { background-color: #f8d7da; }
+            25% {background-color: #f0dce1;}
+            50% {background-color: #f2e6e6;}
+            75% {background-color: #f2ebeb;}
+            100% {background-color: #f2f2f2;}
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+
+</head>
+<body>
+<h1>Welcome, {{ username }}! ID: {{user_id}}</h1>
+<div id="status">🔴 Disconnected</div>
+<div class="container">
+    <h2>Your triggers</h2>
+    <a href="/add_trigger" class="button-style">
+        <button type="button" >Create new</button>
+    </a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Crypto</th>
+        <th>condition</th>
+        <th>Last work</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for t in triggers %}
+        <tr id="row-trigger-{{ t.trigger_id }}">
+            <td>{{t.trigger_id}}</td>
+            <td>{{t.currency}}</td>
+            <td>{{t.pretty_condition}}</td>
+            <td class="last-triggered">
+                {% if t.last_triggered is not none %}
+                    {% if t.is_active %}
+                        {{ t.last_triggered.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% else %}
+                        <p> was {{ t.last_triggered.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+
+
+            </td>
+
+            <td>
+                {% if t.is_active %}
+                    <span style="color:green">Active</span>
+                {% elif not t.is_active and t.last_triggered is not none %}
+                    <span style="color:red">Deactivated</span>
+                {% else %}
+                    <span style="color:gray">not activated</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/edit/{{t.trigger_id}}" class="btn">edit</a>
+            </td>
+            <td>
+                <button class="delete">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="messages" style="margin-top: 20px;"></div>
+
+<script>
+  const currentUserId = "{{ user_id }}";
+</script>
+
+<script src="{{ url_for('static', path='/js/tracking.js') }}"></script>
+</body>
+</html>
