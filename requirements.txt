@@ -1,5 +1,5 @@
 fastapi
-uvicorn[standart]
+uvicorn[standard]
 sqlalchemy
 python-multipart
 pyjwt
@@ -11,4 +11,4 @@ bcrypt==4.0.1
 httpx
 jinja2
 alembic
-dotenv
+python-dotenv

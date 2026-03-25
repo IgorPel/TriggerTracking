@@ -225,20 +225,21 @@ async def edit_trigger(trigger_id: int,
 
     triggerFrDB = result.scalar_one_or_none()
 
-    result = await db.execute(
-                    select(UserToTriggers).where(
-                        and_(
-                            UserToTriggers.c.user_id == current_user.id,
-                            UserToTriggers.c.trigger_id == triggerFrDB.id
-                        )
-                    )
-    )
-
-    if result.scalar_one_or_none() is not None:
-        raise HTTPException(status_code=400, detail="You already have this trigger")
 
     # глянь чи буде ще такий.
     if triggerFrDB is not None:
+        result = await db.execute(
+            select(UserToTriggers).where(
+                and_(
+                    UserToTriggers.c.user_id == current_user.id,
+                    UserToTriggers.c.trigger_id == triggerFrDB.id
+                )
+            )
+        )
+
+        if result.scalar_one_or_none() is not None:
+            raise HTTPException(status_code=400, detail="You already have this trigger")
+
 
         result = await db.execute(
                     select(UserToTriggers.c.is_active)
