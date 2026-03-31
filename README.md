@@ -26,7 +26,7 @@ A robust backend service designed to monitor cryptocurrency markets and execute 
 
 1. **Clone the repository:**
    ```bash
-   git clone [[https://github.com/yourusername/TriggerTracking.git](https://github.com/yourusername/TriggerTracking.git)]
+   git clone https://github.com/yourusername/TriggerTracking.git
    cd crypto-tracker
 2. **Environment Variables:**
    *Create a .env file in the root directory and add your environment variables (see .env.example for reference):
