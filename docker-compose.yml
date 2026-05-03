@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # 1. Твій Python Backend
   backend:
     build: .
     container_name: crypto_backend
@@ -13,12 +12,10 @@ services:
       - redis
     volumes:
       - .:/app
-    # Ця команда автоматично перезавантажить сервер, якщо ти зміниш код
     env_file:
       - .env
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
-  # 2. База даних (PostgreSQL)
   db:
     image: postgres:15-alpine
     container_name: crypto_db
@@ -34,7 +31,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # 3. Графічний інтерфейс (PgAdmin) - ПОВЕРТАЄМО ЙОГО
   pgadmin:
     image: dpage/pgadmin4
     container_name: crypto_pgadmin
@@ -49,7 +45,6 @@ services:
     depends_on:
       - db
 
-  # 4. Redis
   redis:
     image: redis:7-alpine
     container_name: crypto_redis
@@ -64,8 +59,6 @@ services:
       - db
     env_file:
       - .env
-
-    # Beat (тільки дає команду "пора працювати")
   beat:
     build: .
     command: celery -A src.celery_app beat --loglevel=info
