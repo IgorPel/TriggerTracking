@@ -15,12 +15,6 @@ celery_app.conf.update(
     worker_log_format='%(asctime)s [%(levelname)s] %(message)s',
     worker_task_log_format='%(asctime)s [%(levelname)s] %(message)s',
 )
-celery_app.conf.beat_schedule = {
-    'check-crypto-prices-every-minute': {
-        'task': 'src.tasks.cheacking_triggers',
-        'schedule': 120.0,
-    },
 
-}
 
 celery_app.conf.timezone = 'UTC'
