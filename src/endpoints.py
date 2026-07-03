@@ -35,7 +35,6 @@ async def register(request: Request):
 
 @router.post("/register", status_code=201)
 async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
-    # Перевірка чи існує
     result = await db.execute(
                     select(UserDB)
                     .where(
@@ -55,8 +54,8 @@ async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db
     )
 
     db.add(new_user)
-    await db.commit()  # <--- ВАЖЛИВО! Зберігаємо зміни
-    await db.refresh(new_user)  # <--- Оновлюємо об'єкт (отримуємо ID)
+    await db.commit()  
+    await db.refresh(new_user)  
 
     return {"message": "User created successfully"}
 
@@ -76,7 +75,7 @@ async def login_for_access_token(response: Response,
             )
     user = result.scalar_one_or_none()
 
-    # ВИПРАВЛЕНО: Звертаємось через крапку user.hashed_password, а не ["..."]
+    
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -85,7 +84,7 @@ async def login_for_access_token(response: Response,
         )
 
     access_token_expires = timedelta(minutes=int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "60")))
-    # ВИПРАВЛЕНО: user.nickname
+
     access_token = create_access_token(
         data={"sub": user.nickname}, expires_delta=access_token_expires
     )
@@ -152,8 +151,6 @@ async def add_trigger(trigger: QueueRequest,
 
     triggerDB = result.scalar_one_or_none()
 
-    # подивись чи є той зв'язок.
-
     if triggerDB is not None:
 
         result = await db.execute(
@@ -215,7 +212,6 @@ async def edit_trigger(trigger_id: int,
     content_hash, list_trigger = await prepare_trigger(trigger)
 
 
-    #дивимося чи є ще такий тригер.
     result = await db.execute(
                     select(Triggers)
                     .where(
@@ -225,8 +221,6 @@ async def edit_trigger(trigger_id: int,
 
     triggerFrDB = result.scalar_one_or_none()
 
-
-    # глянь чи буде ще такий.
     if triggerFrDB is not None:
         result = await db.execute(
             select(UserToTriggers).where(
@@ -279,7 +273,6 @@ async def edit_trigger(trigger_id: int,
                 )
             )
     else:
-        # дивимося чи є хтось ще підписанний на цей тригер.
         result = await db.execute(
                 select(
                     func.count(UserToTriggers.c.user_id)
@@ -307,8 +300,6 @@ async def edit_trigger(trigger_id: int,
                     is_active=False
                 )
             )
-
-            # а куди зв'язок ?
         else:
             await db.execute(
                 update(Triggers)
@@ -359,17 +350,17 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
     channel = f"alerts-{user_id}"
     await pubsub.subscribe(channel)
     try:
-        # Нескінченний цикл слухання
+      
         while True:
-            # Чекаємо повідомлення з Redis
+           
             message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
 
             if message:
-                # Якщо прийшло повідомлення з Redis -> шлемо в WebSocket
+               
                 data = message["data"]
                 await websocket.send_text(data)
 
-            # Важливо: даємо час іншим процесам (heartbeat), щоб з'єднання не розірвалося
+          
             await asyncio.sleep(0.1)
 
     except WebSocketDisconnect:
@@ -377,7 +368,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
     except Exception as e:
         print(f"WebSocket error: {e}")
     finally:
-        # Закриваємо з'єднання
+       
         await pubsub.unsubscribe(channel)
         await r.close()
 
